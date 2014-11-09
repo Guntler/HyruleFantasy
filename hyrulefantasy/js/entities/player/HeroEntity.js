@@ -89,9 +89,11 @@ game.HeroEntity = game.BaseEntity.extend({
 				dy = this.body.accel.y * me.timer.tick;
 		//}
 			if (me.input.isKeyPressed('attack')) {
-				if(this.currentWep != null) {
-					var myWep = new me.pool.pull("weapon",this.pos.x,this.pos.y,this.currentWep,this);
+				if(this.currentWep != null && !this.attacking) {
+					myWep = new me.pool.pull("weapon",this.pos.x,this.pos.y,this);
 					me.game.world.addChild(myWep,3);
+					//myWep = new WeaponEntity(this.pos.x,this.pos.y,this.currentWep,this);
+					//me.game.add(myWep,1000);
 				}
 			}
 		
