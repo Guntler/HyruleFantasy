@@ -26,7 +26,7 @@ game.HeroEntity = game.BaseEntity.extend({
 		
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
-		
+		console.log(settings);
         // set the default horizontal & vertical speed (accel vector)
         this.body.setVelocity( 1.5, 1.5);
               
@@ -39,10 +39,10 @@ game.HeroEntity = game.BaseEntity.extend({
         this.renderable.addAnimation("left", [5,6],200);
         this.renderable.addAnimation("right", [10,11],200);
         this.renderable.addAnimation("up", [15,16],200);
-		this.renderable.addAnimation("attackdown", [2,3,4],100);
-		this.renderable.addAnimation("attackleft", [7,8,9],100);
-		this.renderable.addAnimation("attackright", [12,13,14],100);
-		this.renderable.addAnimation("attackup", [17,18,19],100);
+		this.renderable.addAnimation("attackdown", [2,3,4],75);
+		this.renderable.addAnimation("attackleft", [7,8,9],75);
+		this.renderable.addAnimation("attackright", [12,13,14],75);
+		this.renderable.addAnimation("attackup", [17,18,19],75);
 		
 		/* Collisions rectangle has 10 width by 14 height */
 		this.body.addShape(new me.Rect(14,16,14,14));
@@ -90,17 +90,16 @@ game.HeroEntity = game.BaseEntity.extend({
 		//}
 			if (me.input.isKeyPressed('attack')) {
 				if(this.currentWep != null && !this.attacking) {
-					myWep = new me.pool.pull("weapon",this.pos.x,this.pos.y,this);
-					me.game.world.addChild(myWep,3);
-					//myWep = new WeaponEntity(this.pos.x,this.pos.y,this.currentWep,this);
-					//me.game.add(myWep,1000);
+					this.currentWep.needsDrawn = true;
+					this.attacking = true;
 				}
 			}
 		
-		this._setDirection(dx,dy);
-		
-		this.body.vel.x += dx;
-		this.body.vel.y += dy;
+		if(!this.attacking) {
+			this._setDirection(dx,dy);
+			this.body.vel.x += dx;
+			this.body.vel.y += dy;
+		}
 		
 		var myLayer = me.game.currentLevel.getLayerByName("collision");  
 		var bottomTile = myLayer.layerData[Math.ceil(this.pos.x / myLayer.tilewidth)][Math.ceil(this.pos.y / myLayer.tileheight)];
@@ -175,7 +174,10 @@ game.HeroEntity = game.BaseEntity.extend({
 	},
 	
 	equipWep: function(weapon) {
+		console.log("stuff333");
 		this.currentWep = weapon;
+		this.currentWep = new me.pool.pull("weapon",this.pos.x,this.pos.y,this);
+		me.game.world.addChild(this.currentWep,3);
 	},
 	
     /**

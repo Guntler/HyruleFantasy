@@ -3,7 +3,7 @@ game.weapons = {
 		name: 'Sword',
 		image: "boy_sword",
 		animation: [2, 3, 4, 5],
-		rate: 225,
+		rate: 450,
 		damage: 1,
 		speed: null,
 		projectile: null,
@@ -11,98 +11,93 @@ game.weapons = {
 		pHeight: null,
 		wWidth: null,
 		wHeight: null,
-		offsetX: 18,
-		offsetY: -16,
+		offsetX: null,
+		offsetY: null,
 		addOffset: null,
-		attackRect: [[18, 27, 6, 13],[4, 22, 16, 5],[24, 22, 16, 5],[15, 5, 3, 15]] //down, left, right, up
+		attackRect: [[0, 23, 0, 32],[0, 23, 0, 32],[0, 23, 0, 32],[0, 23, 0, 32]] //down, left, right, up
 	}
 };
 
-game.WeaponEntity = game.BaseEntity.extend({
+game.EnemyEntity = game.BaseEntity.extend({
   
     init: function(x, y, owner) {
+		this.draw = false;
 		this.owner = owner;
 		this.weapon = game.weapons[owner.currentWep];
-	
 		
     	/*settings.image = this.weapon.image;
     	settings.spritewidth = 44;
 		settings.spriteheight = 40;
 		settings.width = 44;
 		settings.height = 44;*/
-    	this.needsDrawn = false;
+    	
 		
         // call the constructor
         this._super(me.Entity, 'init', [x, y, {image: this.weapon.image, width: 44, height: 40, spritewidth: 44, spriteheight: 40}]);
 
         this.body.gravity = 0;
 		
-        this.renderable.addAnimation("down", [0,1,2],75);
-        this.renderable.addAnimation("left", [3,4,5],75);
-        this.renderable.addAnimation("right", [6,7,8],75);
-        this.renderable.addAnimation("up", [9,10,11],75);
+        this.renderable.addAnimation("down", [0,1,2],100);
+        this.renderable.addAnimation("left", [3,4,5],100);
+        this.renderable.addAnimation("right", [6,7,8],100);
+        this.renderable.addAnimation("up", [9,10,11],100);
 		
 		this.body.collidable = true;
-		this.body.addShape(new me.Rect(16,18,14,14));
+		this.body.addShape(new me.Rect(16,18,11,11));
 		
 		this.body.addShape(new me.Rect(this.weapon.attackRect[0][0],this.weapon.attackRect[0][1],this.weapon.attackRect[0][2],this.weapon.attackRect[0][3]));	//Down
 		this.body.addShape(new me.Rect(this.weapon.attackRect[1][0],this.weapon.attackRect[1][1],this.weapon.attackRect[1][2],this.weapon.attackRect[1][3]));	//Left
 		this.body.addShape(new me.Rect(this.weapon.attackRect[2][0],this.weapon.attackRect[2][1],this.weapon.attackRect[2][2],this.weapon.attackRect[2][3]));	//Right
 		this.body.addShape(new me.Rect(this.weapon.attackRect[3][0],this.weapon.attackRect[3][1],this.weapon.attackRect[3][2],this.weapon.attackRect[3][3]));	//Up
 		this.body.setShape(0);
-		this.body.setCollisionMask(me.collision.types.NO_OBJECT);
+		this.body.setCollisionMask(me.collision.types.ENEMY_OBJECT);
+		me.collision.check(this, true, this.collisionHandler.bind(this), true);
         
 		this.direction = owner.direction;
 		this.renderable.setCurrentAnimation( this.direction );
     },
 	
+	/**
+	 * collision handler
+	 */
+	collisionHandler : function (response) {
+		//this.doTalk( res.obj );
+		if (response.b.body.collisionType === me.collision.types.PLAYER_OBJECT) {
+			this.pos.x -= response.b.x;
+    		this.pos.y -= response.b.y;
+			console.log("Collided with player.");
+		}
+	},
+	
 	attack : function() {
 		if (me.input.isKeyPressed('attack')) {
-			this.needsDrawn = true;
 			this.owner.attacking = true;
 			
 			this.owner.renderable.setCurrentAnimation("attack"+this.owner.direction);
-			this.renderable.setCurrentAnimation(this.owner.direction);
-			this.owner.renderable.setAnimationFrame();
 			this.renderable.setAnimationFrame();
 			
-			this.pos.x = this.owner.pos.x;// + this.weapon.offsetX;
-			this.pos.y = this.owner.pos.y;// + this.weapon.offsetY;
-			
 			if(this.owner.direction=="down") {
-				this.anchorPoint.set(0.5, 0.88);
-				//this.pos.x += this.weapon.attackRect[0][0];
-				//this.pos.y -= this.weapon.attackRect[0][1];
 				this.body.setShape(1);
 			}
 			else if(this.owner.direction=="left") {
-				this.anchorPoint.set(0.18, 0.55);
-				//this.pos.x += this.weapon.attackRect[1][0];
-				//this.pos.y -= this.weapon.attackRect[1][1];
 				this.body.setShape(2);
 			}
 			else if(this.owner.direction=="right") {
-				this.anchorPoint.set(0.88, 0.55);
-				//this.pos.x += this.weapon.attackRect[2][0];
-				//this.pos.y -= this.weapon.attackRect[2][1];
 				this.body.setShape(3);
 			}
 			else if(this.owner.direction=="up") {
-				this.anchorPoint.set(0.37, 0.1);
-				//this.pos.x += this.weapon.attackRect[3][0];
-				//this.pos.y -= this.weapon.attackRect[3][1];
 				this.body.setShape(4);
 			}
 			else {
 				
 			}
 			
-			var self = this;
 			setTimeout(function() {
 				console.log("stuff");
-				self.body.setShape(0);
-				self.owner.attacking = false;
-				self.needsDrawn = false;
+				this.body.setShape(0);
+				this.owner.attacking = false;
+				this.draw = false;
+				//me.game.world.removeChild(this);
 			}, this.weapon.rate);
 			/*TODO attack*/
 		}
@@ -110,8 +105,16 @@ game.WeaponEntity = game.BaseEntity.extend({
 	
 	draw: function(renderer) {
 		/* Call overriden function */
-		if(this.needsDrawn) {
+		if(this.draw) {
 			this._super(me.Entity, 'draw', [renderer]);
+		}
+	},
+	
+	onCollision: function(res, obj) {
+		// res.y >0 means touched by something on the bottom
+		// which mean at top position for this one
+		if (this.alive && (res.y > 0) && obj.falling) {
+			this.renderable.flicker(750);
 		}
 	},
 	
@@ -119,12 +122,23 @@ game.WeaponEntity = game.BaseEntity.extend({
         // check & update player movement
         this.body.update(dt);
 		
+        // check for collision
+		// TODO
+        var res =  me.game.world.collide(this);
+    	if (res && (res.obj.type == me.game.ENEMY_OBJECT)) {        		    		  		    		  		    	  
+    		delete this._target;    		
+    		this.pos.x -= res.x;
+    		this.pos.y -= res.y; 
+    		
+    		this.doTalk( res.obj );
+		}
+		
 		if (me.input.isKeyPressed('attack') && !this.owner.attacking) {
 			this.attack();
 		}
 
         // update animation if necessary
-        if (this.owner.attacking) {
+        if (this.body.vel.x!=0 || this.body.vel.y!=0 && this.collidable) {
             // update object animation
             this._super(me.Entity, 'update', [dt]);
             return true;
