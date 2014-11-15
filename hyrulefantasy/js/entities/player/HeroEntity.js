@@ -26,7 +26,6 @@ game.HeroEntity = game.BaseEntity.extend({
 		
         // call the constructor
         this._super(me.Entity, 'init', [x, y, settings]);
-		console.log(settings);
         // set the default horizontal & vertical speed (accel vector)
         this.body.setVelocity( 1.5, 1.5);
               
@@ -174,10 +173,9 @@ game.HeroEntity = game.BaseEntity.extend({
 	},
 	
 	equipWep: function(weapon) {
-		console.log("stuff333");
 		this.currentWep = weapon;
 		this.currentWep = new me.pool.pull("weapon",this.pos.x,this.pos.y,this);
-		me.game.world.addChild(this.currentWep,3);
+		me.game.world.addChild(this.currentWep,4);
 	},
 	
     /**

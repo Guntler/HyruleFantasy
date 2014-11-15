@@ -69,26 +69,42 @@ game.WeaponEntity = game.BaseEntity.extend({
 			this.pos.x = this.owner.pos.x;// + this.weapon.offsetX;
 			this.pos.y = this.owner.pos.y;// + this.weapon.offsetY;
 			
+			var colLayer = me.game.currentLevel.getLayerByName("collision");
+			var bushLayer = me.game.currentLevel.getLayerByName("bushlayer");
+			
+			var tileX = Math.ceil(this.pos.x / colLayer.tilewidth);
+			var tileY = Math.ceil(this.pos.y / colLayer.tileheight);
+			var botTileX = 0;
+			var botTileY = 0;
+			
 			if(this.owner.direction=="down") {
 				this.anchorPoint.set(0.5, 0.88);
+				var botTileX = Math.ceil(this.pos.x / colLayer.tilewidth);
+				var botTileY = Math.ceil((this.pos.y+this.weapon.attackRect[0][4]) / colLayer.tileheight);
 				//this.pos.x += this.weapon.attackRect[0][0];
 				//this.pos.y -= this.weapon.attackRect[0][1];
 				this.body.setShape(1);
 			}
 			else if(this.owner.direction=="left") {
 				this.anchorPoint.set(0.18, 0.55);
+				var botTileX = Math.ceil((this.pos.x+this.weapon.attackRect[1][3]) / colLayer.tilewidth);
+				var botTileY = Math.ceil(this.pos.y / colLayer.tileheight);
 				//this.pos.x += this.weapon.attackRect[1][0];
 				//this.pos.y -= this.weapon.attackRect[1][1];
 				this.body.setShape(2);
 			}
 			else if(this.owner.direction=="right") {
 				this.anchorPoint.set(0.88, 0.55);
+				var botTileX = Math.ceil((this.pos.x+this.weapon.attackRect[2][3]) / colLayer.tilewidth);
+				var botTileY = Math.ceil(this.pos.y / colLayer.tileheight);
 				//this.pos.x += this.weapon.attackRect[2][0];
 				//this.pos.y -= this.weapon.attackRect[2][1];
 				this.body.setShape(3);
 			}
 			else if(this.owner.direction=="up") {
 				this.anchorPoint.set(0.37, 0.1);
+				var botTileX = Math.ceil(this.pos.x / colLayer.tilewidth);
+				var botTileY = Math.ceil((this.pos.y-this.weapon.attackRect[3][4]) / colLayer.tileheight);
 				//this.pos.x += this.weapon.attackRect[3][0];
 				//this.pos.y -= this.weapon.attackRect[3][1];
 				this.body.setShape(4);
@@ -97,9 +113,33 @@ game.WeaponEntity = game.BaseEntity.extend({
 				
 			}
 			
+			var bottomTile = colLayer.layerData[botTileX][botTileY];
+			var topTile = colLayer.layerData[tileX][tileY];
+			if(bottomTile != null) {
+				var myTileProperty = colLayer.tileset.getTileProperties(bottomTile.tileId);
+				if (myTileProperty.tallgrass) {
+					me.sys.preRender = false;
+					console.log(bottomTile);
+					colLayer.clearTile(tileX,tileY);
+					bushLayer.clearTile(tileX,tileY);
+					me.sys.preRender = true;
+				}
+			}
+			else if(topTile != null) {
+				var myTileProperty = colLayer.tileset.getTileProperties(topTile.tileId);
+				if (myTileProperty.tallgrass) {
+					me.sys.preRender = false;
+					console.log(topTile);
+					colLayer.clearTile(tileX,tileY);
+					bushLayer.clearTile(tileX,tileY);
+					me.sys.preRender = true;
+				}
+			}
+			else {
+			}
+			
 			var self = this;
 			setTimeout(function() {
-				console.log("stuff");
 				self.body.setShape(0);
 				self.owner.attacking = false;
 				self.needsDrawn = false;
