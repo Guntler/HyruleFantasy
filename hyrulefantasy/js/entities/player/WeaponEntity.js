@@ -143,6 +143,8 @@ game.WeaponEntity = game.BaseEntity.extend({
 				self.body.setShape(0);
 				self.owner.attacking = false;
 				self.needsDrawn = false;
+				self.owner.renderable.setCurrentAnimation(this.owner.direction);
+				self.owner.renderable.setAnimationFrame();
 			}, this.weapon.rate);
 			/*TODO attack*/
 		}
