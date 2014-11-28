@@ -5,7 +5,12 @@
  </tileset>
  <layer name="Tile Layer 1" width="20" height="15">
   <data encoding="base64" compression="zlib">
-   eJytkjEOwjAMRZMRBIeoBNyhCI7Bxi06FU4BXQg3AKb2Fu3G2sMgbBELy9gBpA5Prlrn5TtpcM6dgTBQHdIVBnZ9y9cB7R/vtXzUi/XknauVNQ1wN5ytcDwEVj781ivrewPyyXx8T+wrgV2CPXPW7vO8GuZCLsA1wY31yhm0meq4B9WlfzP19vwa2l1xV57wlsZZyLsqYO1WuHIl8wE4Mqf1/6GPGAFzYBI9RXTjM/mqH/KhZxxda2AmvJl/3SP5LBdWyrSIrg2wEt6MzVwlZsX6BLcEs2o=
+   eJybycDAMAuIZyLRm4D4FhDfBmIxJkx8E4sefPQpAuZ9JMEsYtwHcyOp7psOxIfJ9DPIjJNQ+h/UPEJhiM+sGYwQc5AxuXECCq+NUBrdTHLch242sebdIsNMQuYRG7/EmEeqWfVA/JmK4UcoPZPiPnxuI9V9hPLaQVB6ZYCkf2LzHCG/wtIsul4AdAGgig==
+  </data>
+ </layer>
+ <layer name="Tile Layer 2" width="20" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAd9DCSoQkPWEJl82hh5mD382B3Hy3MpKafB3v4DaT7QHb3Utn+pXjMw+dXABg6CiA=
   </data>
  </layer>
 </map>
